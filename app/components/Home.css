@@ -1,14 +1,74 @@
-.container {
-  position: absolute;
-  top: 30%;
-  left: 10px;
-  text-align: center;
+.home-container {
+  display:flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.container h2 {
-  font-size: 5rem;
+.table-container{
+  align-self: auto;
 }
 
-.container a {
-  font-size: 1.4rem;
+.chrono-container {
+  border-radius: 8px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  height: 100px;
+  width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timer-container{
+  align-self: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+}
+
+.glass{
+  background-clip: padding-box;
+  background: rgba(255,255,255,.35);
+}
+
+.button-container {
+  display: inline-flex;
+}
+
+.timer-button{
+  border: none;
+  margin: 0px;
+  width: 50px;
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
+.timer-button:hover{
+  background: rgba(255,255,255,.30);
+}
+
+.start {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.pause {
+  border-radius: 0px;
+}
+
+.reset {
+  border-radius: 0px;
+}
+
+.stop {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.task-table{
+  width: 600px;
+  height: 300px;
 }

@@ -1,0 +1,34 @@
+.current-task-container{
+  display: flex;
+}
+
+.current-title{
+  font-weight: bold;
+  padding: 15px;
+  padding-right: 0px;
+  border-radius: 8px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-color: rgba(65, 65, 65, 0.35);
+}
+
+.current-task-name{
+  width: 328.5px;
+  padding: 15px;
+  padding-left: 10px;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-color: rgba(65, 65, 65, 0.35);
+}
+
+.current-task-aet{
+  width: 80px;
+  padding: 15px;
+  padding-left: 10px;
+  border-radius: 8px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-color: rgba(65, 65, 65, 0.35);
+}

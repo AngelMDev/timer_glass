@@ -1,0 +1,48 @@
+.sidebar-bg{
+  background: inherit;
+  width: 10%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+}
+
+.sidebar-bg:before{
+  content: " ";
+  width: 110%;
+  height: 100%;
+  background: inherit; 
+  position: absolute;
+  left: -5%; 
+  box-shadow: inset 0 0 0 200px rgba(255,255,255,0.3);
+  filter: blur(5px);
+ }
+
+.sidebar {
+  overflow: hidden;
+  height: 100%; /* 100% Full-height */
+  width: 10%; /* 0 width - change this with JavaScript */
+  position: fixed; /* Stay in place */
+  top: 0; /* Stay at the top */
+  left: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+
+a {
+  text-decoration: none;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+}
+
+
