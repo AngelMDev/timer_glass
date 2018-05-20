@@ -12,7 +12,6 @@ class Stats extends Component{
     this.dbManager=new DBManager(db);
     var ratedList=this.dbManager.ratedList;
     db.close()
-    console.log(ratedList)
     const taskTableColumns =[{
       Header:'Name',
       accessor:'name',

@@ -4,6 +4,7 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 import matchSorter from 'match-sorter';
 import CurrentlyRating from './CurrentlyRating'
+var _ = require('lodash');
 var remote = window.require('electron').remote;
 const {globalShortcut} = remote;
 var EasyTimer = require('easytimer.js');
@@ -15,6 +16,8 @@ class Home extends Component{
     super(props);
     this.state={selected:null}
     this.initializeDB();
+    //var res=this.dbManager.insertTask("Exp YT",8);
+    //debugger
     //this.dbManager.insertRated(2,650);
     this.db.close();
   }
@@ -31,9 +34,7 @@ class Home extends Component{
 
   stopTimer(){
     this.timer.stop();
-    this.initializeDB();
-    this.dbManager.insertRated(this.getSelectedTask().task_id,this.timer.state.elapsed);
-    this.db.close();
+    this.insertRatedTask();
   }
 
   pauseTimer(){
@@ -42,8 +43,15 @@ class Home extends Component{
 
   resetTimer(){
     this.timer.reset();
+    this.insertRatedTask();
+  }
+
+  insertRatedTask(){
     this.initializeDB();
-    this.dbManager.insertRated(this.getSelectedTask().task_id,this.timer.state.elapsed);
+    var res=this.dbManager.insertTask(this.currentlyRating.state.task,this.currentlyRating.state.aet);
+    this.setState({selected:res})
+    this.dbManager.insertRated(res.task_id,this.timer.state.elapsed);
+    this.taskList = this.getTaskList();
     this.db.close();
   }
 
@@ -51,22 +59,11 @@ class Home extends Component{
     return this.dbManager.taskList;
   }
 
-  isSelected(id){
-    if(this.state.selected!==null){
-      return this.state.selected===id;
-    }
-    return false;
-  }
-
   getSelectedTask(){
-    if(this.state.selected===null) return {name:' None selected ',aet:' - '};
     return this.state.selected
   }
 
   render(){
-    // this.dbManager.insertTask("Exp YT",8);
-     
-    
     const taskTableColumns =[{
       Header:'Name',
       accessor:'name',
@@ -98,8 +95,9 @@ class Home extends Component{
           </div>
         </div>
         <CurrentlyRating 
-          task={this.getSelectedTask().name}
-          aet={this.getSelectedTask().aet}
+          // task={this.getSelectedTask().name}
+          // aet={this.getSelectedTask().aet}
+          ref={currentlyRating => this.currentlyRating = currentlyRating}
         />
         <div className="table-container">
           <ReactTable 
@@ -111,17 +109,18 @@ class Home extends Component{
                 filterable={true}
                 getTrProps={(state, rowInfo) => {                           
                   if (rowInfo !== undefined){
-                  const selected=this.isSelected(rowInfo.original.task_id); 
-                  return {
-                      onClick: (e) => { 
-                        if(this.state.selected != rowInfo.original){                                     
+                  return {                     
+                      onClick: (e) => {                        
+                        if(!_.isEqual(this.state.selected,rowInfo.original)){                                     
                           this.setState({ selected: rowInfo.original })
+                          this.currentlyRating.changeCurrentTask(rowInfo.original.name,rowInfo.original.aet);
                         }else{
                           this.setState({ selected: null })
+                          this.currentlyRating.changeCurrentTask('None selected','-');
                         }
                       },
                       style: {
-                          backgroundColor: rowInfo.original === this.state.selected ? 'rgba(255,255,255,.35)' : 'inherit'
+                          backgroundColor: (this.state.selected && _.isEqual(rowInfo.original.task_id,this.state.selected.task_id)) ? 'rgba(255,255,255,.35)' : 'inherit'
                       }
                     } 
                   }else {

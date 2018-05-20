@@ -42,10 +42,10 @@ class DBManager {
       ':aet': _aet,
       ':last_used': null,
     };
-    this.db.run('INSERT INTO Tasks VALUES (:task_id,:name,:aet,:last_used)',task);
+    this.db.run(`INSERT INTO Tasks(name,aet) SELECT '${_name}', ${_aet} WHERE NOT EXISTS(SELECT 1 FROM Tasks WHERE name ='${_name}' AND aet = ${_aet})`,task); 
     console.log("Inserted into Tasks");
     this.save();
-    //return this.db.exec('SELECT * FROM Tasks WHERE task_id = ?',[_index])[0];
+    return DBManager.formatResult(this.db.exec(`SELECT * FROM Tasks WHERE name = '${_name}' AND aet = ${_aet}`))[0];
   }
 
   insertRated(_taskId, _time,_completedAt=new Date().toLocaleTimeString("en-US",this.dateOptions)){
@@ -85,8 +85,8 @@ class DBManager {
     return obj[Object.keys(obj)[0]];
   }
 
-  findTasks(value){
-    var res = this.db.exec(`SELECT * FROM Tasks WHERE name LIKE '%${value}%' OR aet = ${value}`)
+  taskExists(name,aet){
+    var res = this.db.exec(`SELECT * FROM Tasks WHERE name LIKE '%${name}%' OR aet = ${aet}`)
     return DBManager.formatResult(res)
   }
 
@@ -101,7 +101,7 @@ class DBManager {
   }
 
   static formatResult(arr){
-    if (arr.length===0) return null;
+    if (arr.length===0) return [];
     var obj=arr[0];
     var newArr=[];
     obj.values.forEach(function(value){
