@@ -10,15 +10,20 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron';
 import MenuBuilder from './menu';
+const path = require('path');
+const iconPath=path.join('./assets/icons/','hourglass.png')
+const trayIcon=nativeImage.createFromPath(iconPath);
 
 let mainWindow = null;
+var tray=null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
 }
+
 
 if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
   require('electron-debug')();
@@ -83,4 +88,13 @@ app.on('ready', async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
+
+  tray=new Tray(trayIcon);
+  tray.setTitle('00:00');
+  const contextMenu = Menu.buildFromTemplate([
+    {label:'Item1', type: 'radio'}
+  ])
+  tray.setToolTip('This is my application');
+  tray.setContextMenu(contextMenu);
+  global.tray=tray;
 });

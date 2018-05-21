@@ -4,6 +4,7 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 import matchSorter from 'match-sorter';
 import CurrentlyRating from './CurrentlyRating'
+import TimerComponent from './TimerComponent'
 var _ = require('lodash');
 var remote = window.require('electron').remote;
 const {globalShortcut} = remote;
@@ -29,20 +30,20 @@ class Home extends Component{
   }
 
   startTimer(){
-    this.timer.start();
+    this.timerComponent.pauseStart();
   }
 
   stopTimer(){
-    this.timer.stop();
+    this.timerComponent.stop();
     this.insertRatedTask();
   }
 
-  pauseTimer(){
-    this.timer.pause();
+  resetTimer(){
+    this.timerComponent.stop();
   }
 
-  resetTimer(){
-    this.timer.reset();
+  submitTimer(){
+    this.timerComponent.submit();
     this.insertRatedTask();
   }
 
@@ -50,7 +51,7 @@ class Home extends Component{
     this.initializeDB();
     var res=this.dbManager.insertTask(this.currentlyRating.state.task,this.currentlyRating.state.aet);
     this.setState({selected:res})
-    this.dbManager.insertRated(res.task_id,this.timer.state.elapsed);
+    this.dbManager.insertRated(res.task_id,this.timerComponent.state.elapsed);
     this.taskList = this.getTaskList();
     this.db.close();
   }
@@ -61,6 +62,13 @@ class Home extends Component{
 
   getSelectedTask(){
     return this.state.selected
+  }
+
+  getTimerState(){
+    if (this.timerComponent===undefined){
+      return {started: false}
+    }
+    return this.timerComponent.state;
   }
 
   render(){
@@ -85,14 +93,13 @@ class Home extends Component{
       <div className="home-container">
         <div className="timer-container">
           <TimerComponent 
-            ref={timer => this.timer = timer}
+            ref={timerComponent => this.timerComponent = timerComponent}
+            timer={this.props.timer}
+            start={this.startTimer.bind(this)}
+            stop={this.stopTimer.bind(this)}
+            reset={this.resetTimer.bind(this)}
+            submit={this.submitTimer.bind(this)}
           />
-          <div className="button-container">
-            <StartButton onClick={this.startTimer.bind(this)} />
-            <PauseButton onClick={this.pauseTimer.bind(this)} />
-            <ResetButton onClick={this.resetTimer.bind(this)} />
-            <StopButton onClick={this.stopTimer.bind(this)} />        
-          </div>
         </div>
         <CurrentlyRating 
           // task={this.getSelectedTask().name}
@@ -133,114 +140,6 @@ class Home extends Component{
     );
   }
 }
-
-class TimerComponent extends Component{
-  constructor(props){
-    super(props);
-    this.props=props;
-    this.state={elapsed: "00:00", started: false};
-    this.timer=new EasyTimer();
-  }
-
-  componentDidMount(){
-    this.setEventListeners(this);
-    this.registerShortcuts(this); 
-  }
-
-  registerShortcuts(self){
-    globalShortcut.register('CommandOrControl+Alt+S',function(){
-      self.pauseStart();
-    });
-    
-    globalShortcut.register('CommandOrControl+Alt+D',function(){
-      self.reset();
-    })
-
-    globalShortcut.register('CommandOrControl+Alt+Z',function(){
-      self.stop();
-    })
-  }
-
-
-  setEventListeners(self){
-    this.timer.addEventListener('secondsUpdated',function(){
-      self.setState({elapsed: self.timer.getTimeValues().toString(['minutes','seconds'])});
-    })
-    this.timer.addEventListener('started', function (e) {
-      self.setState({elapsed: self.timer.getTimeValues().toString(['minutes','seconds'])});
-    });
-    this.timer.addEventListener('reset', function (e) {
-      self.setState({elapsed: self.timer.getTimeValues().toString(['minutes','seconds'])});
-    });
-  }
-
-  pauseStart(){
-    if(this.state.started){
-      this.pause();
-    }else{
-      this.start();
-    }
-  }
-
-  start(){
-    this.setState({started: true})
-    this.timer.start();
-  }
-
-  pause(){
-    this.setState({started: false})
-    this.timer.pause();
-  }
-
-  stop(){
-    this.setState({started: false})
-    this.timer.reset();
-    this.timer.pause();
-  }
-
-  reset(){
-    this.setState({started: true})
-    this.timer.reset();
-  }
-  
-
-  render(){
-    return(<div className="chrono-container glass"><h1>{this.state.elapsed}</h1></div>);
-  }
-}
-
-class StartButton extends React.Component{
-  render(){
-    return(
-      <button className="timer-button start" onClick={this.props.onClick}>Start</button>
-    );
-  }
-}
-
-class StopButton extends React.Component{
-  render(){
-    return(
-      <button className="timer-button stop" onClick={this.props.onClick}>Stop</button>
-    );
-  }
-}
-
-class PauseButton extends React.Component{
-  render(){
-    return(
-      <button className="timer-button pause" onClick={this.props.onClick}>Pause</button>
-    );
-  }
-}
-
-class ResetButton extends React.Component{
-  render(){
-    return(
-      <button className="timer-button reset" onClick={this.props.onClick}>Submit</button>
-    );
-  }
-}
-
 
 
 export default Home;
