@@ -81,7 +81,7 @@ class DBManager {
   }
 
   getTimesTaskUsed(task_id){
-    var obj=this.db.exec('SELECT COUNT(rated_id) FROM Tasks INNER JOIN Rated ON Rated.task_id = Tasks.task_id WHERE task_id=3')[0];
+    var obj=this.db.exec('SELECT COUNT(rated_id) FROM Tasks INNER JOIN Rated ON Rated.task_id = Tasks.task_id WHERE task_id=?',[task_id])[0];
     return obj[Object.keys(obj)[0]];
   }
 
@@ -98,6 +98,11 @@ class DBManager {
   getRated(ratedId){
     var res = this.db.exec('SELECT * FROM Tasks INNER JOIN Rated ON Rated.task_id = Tasks.task_id WHERE rated_id=?',[ratedId])[0]
     return DBManager.formatResult(res)
+  }
+
+  getRatedListByTaskId(taskId){
+    var res = this.db.exec(`SELECT * FROM Rated INNER JOIN Tasks ON Rated.task_id = Tasks.task_id WHERE Rated.task_id=${taskId}`)
+    return DBManager.formatResult(res);
   }
 
   static formatResult(arr){

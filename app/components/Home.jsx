@@ -10,6 +10,7 @@ var remote = window.require('electron').remote;
 const {globalShortcut} = remote;
 var EasyTimer = require('easytimer.js');
 var DBManager = require('../DB_Manager.js')
+const {dialog} = window.require('electron').remote
 
 class Home extends Component{
 
@@ -20,13 +21,14 @@ class Home extends Component{
     //var res=this.dbManager.insertTask("Exp YT",8);
     //debugger
     //this.dbManager.insertRated(2,650);
+    this.taskList = this.getTaskList();
     this.db.close();
   }
 
   initializeDB(){
     this.db=DBManager.load();
     this.dbManager=new DBManager(this.db);
-    this.taskList = this.getTaskList();
+    
   }
 
   startTimer(){
@@ -71,6 +73,42 @@ class Home extends Component{
     return this.timerComponent.state;
   }
 
+  handleEdit(row){
+    debugger
+  }
+
+  handleDelete(record){
+    var id=record.task_id;
+    this.initializeDB();
+    var count=this.dbManager.getRatedListByTaskId(id).length;
+    if(count>0){
+      dialog.showMessageBox({
+        type:"warning",
+        title:"Are you sure you want to delete this task?",
+        message: "There are "+count+" RATED tasks associated with this task that would be DELETED if you continue."+
+        " Consider editing this task instead or associating the rated tasks to another task by editing them."+
+        " Do you want to continue?",
+        buttons: ["Yes", "Cancel"],
+        cancelId:1
+      },function(response){
+        if(response==1) return;
+        console.log("DELETED", record)
+      });
+    }else{
+      dialog.showMessageBox({
+        type:"info",
+        title:"Are you sure you want to delete this task?",
+        message: "You can safely delete this task without affecting RATED tasks. Continue?",
+        buttons: ["Yes", "Cancel"],
+        cancelId:1
+      },function(response){
+        if(response==1) return;
+        console.log("DELETED", record)
+      });
+    }
+    this.db.close(); 
+  }
+
   render(){
     const taskTableColumns =[{
       Header:'Name',
@@ -88,6 +126,15 @@ class Home extends Component{
       accessor:'last_used',
       filterable: false,
       minWidth: 200
+    },{
+      Header: '',
+      filterable: true,
+      Cell: row => (
+        <div>
+          <button className="edit-btn" onClick={() => this.handleEdit(row)}>Edit</button>
+          <button className="delete-btn" onClick={() => this.handleDelete(row.original)}>Delete</button>
+        </div>
+      )
     }]
     return(
       <div className="home-container">
@@ -116,7 +163,7 @@ class Home extends Component{
                 filterable={true}
                 getTrProps={(state, rowInfo) => {                           
                   if (rowInfo !== undefined){
-                  return {                     
+                  return {                  
                       onClick: (e) => {                        
                         if(!_.isEqual(this.state.selected,rowInfo.original)){                                     
                           this.setState({ selected: rowInfo.original })
