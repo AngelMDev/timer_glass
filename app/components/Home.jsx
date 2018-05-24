@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './Home.css'
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 import matchSorter from 'match-sorter';
 import CurrentlyRating from './CurrentlyRating'
 import TimerComponent from './TimerComponent'
+import './Home.css'
 var _ = require('lodash');
 var remote = window.require('electron').remote;
 const {globalShortcut} = remote;
@@ -16,7 +16,7 @@ class Home extends Component{
 
   constructor(props){
     super(props);
-    this.state={selected:null}
+    this.state={selected:null,editing:null}
     this.initializeDB();
     //var res=this.dbManager.insertTask("Exp YT",8);
     //debugger
@@ -74,7 +74,14 @@ class Home extends Component{
   }
 
   handleEdit(row){
+    this.setState({editing:row})
+  }
+
+  handleBlur(record,evt){
     debugger
+    if(!_.isEqual(this.state.editing,this.state.selected)){
+      this.setState({editing:null})
+    }
   }
 
   handleDelete(record){
@@ -115,12 +122,27 @@ class Home extends Component{
       accessor:'name',
       filterMethod: (filter, rows) => matchSorter(rows, filter.value, { keys: ["name","aet"] }),
       filterAll: true,
-      minWidth: 150
+      minWidth: 150,
+      //Check width of input
+      Cell: row => {
+        var is_editing=(_.isEqual(this.state.editing,row.original)) ? "" : "disabled";
+        return(
+          //Check width of this thing
+          <input type="text" id="editable" className={"glass edit-name "+is_editing} defaultValue={row.value} disabled={is_editing} onBlur={(evt) => this.handleBlur(row.original,evt)}></input> 
+        )
+      }
     },{
       Header:'AET',
       accessor:'aet',
       filterable: false,
-      maxWidth:100
+      maxWidth:100,
+      Cell: row => {
+        var is_editing=(_.isEqual(this.state.editing,row.original)) ? "" : "disabled";
+        return(
+          //Check width of this thing
+          <input type="text" id="editable" className={"glass edit-aet "+is_editing} defaultValue={row.value} disabled={is_editing} onBlur={(evt) => this.handleBlur(row.original,evt)}></input> 
+        )
+      }
     },{
       Header:'Last Used',
       accessor:'last_used',
@@ -129,12 +151,14 @@ class Home extends Component{
     },{
       Header: '',
       filterable: true,
-      Cell: row => (
-        <div>
-          <button className="edit-btn" onClick={() => this.handleEdit(row)}>Edit</button>
-          <button className="delete-btn" onClick={() => this.handleDelete(row.original)}>Delete</button>
-        </div>
-      )
+      Cell: row => { 
+        return(
+          <div>
+            <button className="edit-btn" onClick={() => this.handleEdit(row.original)}>Edit</button>
+            <button className="delete-btn" onClick={() => this.handleDelete(row.original)}>Delete</button>
+          </div>
+        )
+      }
     }]
     return(
       <div className="home-container">
@@ -165,9 +189,13 @@ class Home extends Component{
                   if (rowInfo !== undefined){
                   return {                  
                       onClick: (e) => {                        
-                        if(!_.isEqual(this.state.selected,rowInfo.original)){                                     
+                        if(!_.isEqual(this.state.selected,rowInfo.original) || _.isEqual(this.state.editing,rowInfo.original)){                                     
                           this.setState({ selected: rowInfo.original })
                           this.currentlyRating.changeCurrentTask(rowInfo.original.name,rowInfo.original.aet);
+                          debugger
+                          if(!_.isEqual(this.state.editing,this.state.selected)){
+                            this.setState({editing:null})
+                          }
                         }else{
                           this.setState({ selected: null })
                           this.currentlyRating.changeCurrentTask('None selected','-');
