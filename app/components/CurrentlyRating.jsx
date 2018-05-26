@@ -5,7 +5,8 @@ class CurrentlyRating extends Component{
 
   constructor(props){
     super(props);
-    this.state={task:this.props.task,aet:this.props.aet};
+    this.state={task:this.props.task,aet:this.props.aet,reactTable:null};
+    this.reactTable=props.reactTable;
   }
 
   changeCurrentTask(_task,_aet){
@@ -13,7 +14,8 @@ class CurrentlyRating extends Component{
   }
 
   handleNameChange(e){
-    this.setState({task:e.target.value})
+    this.setState({task:e.target.value});
+    this.state.reactTable.filterColumn('name',e.target.value);
   }
 
   handleAetChange(e){

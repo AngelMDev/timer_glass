@@ -25,6 +25,10 @@ class Home extends Component{
     this.db.close();
   }
 
+  componentDidMount(){
+    this.currentlyRating.setState({reactTable:this.reactTable});
+  }
+
   initializeDB(){
     this.db=DBManager.load();
     this.dbManager=new DBManager(this.db);
@@ -73,15 +77,24 @@ class Home extends Component{
     return this.timerComponent.state;
   }
 
+  filterTable=(filter,row,column)=>{
+    debugger
+    var task=this.currentlyRating.state.task;
+    return matchSorter(rows, filter.value, { keys: ["name","aet"] });
+  }
+
   handleEdit(row){
     this.setState({editing:row})
   }
 
   handleBlur(record,evt){
-    debugger
     if(!_.isEqual(this.state.editing,this.state.selected)){
       this.setState({editing:null})
     }
+  }
+
+  getReactTable(){
+    return this.reactTable;
   }
 
   handleDelete(record){
@@ -120,8 +133,8 @@ class Home extends Component{
     const taskTableColumns =[{
       Header:'Name',
       accessor:'name',
-      filterMethod: (filter, rows) => matchSorter(rows, filter.value, { keys: ["name","aet"] }),
-      filterAll: true,
+      //filterMethod: (filter, rows) => matchSorter(rows, filter.value, { keys: ["name","aet"] }),
+      filterable: false,
       minWidth: 150,
       //Check width of input
       Cell: row => {
@@ -150,7 +163,7 @@ class Home extends Component{
       minWidth: 200
     },{
       Header: '',
-      filterable: true,
+      filterable: false,
       Cell: row => { 
         return(
           <div>
@@ -173,29 +186,31 @@ class Home extends Component{
           />
         </div>
         <CurrentlyRating 
-          // task={this.getSelectedTask().name}
-          // aet={this.getSelectedTask().aet}
-          ref={currentlyRating => this.currentlyRating = currentlyRating}
-        />
+            // task={this.getSelectedTask().name}
+            // aet={this.getSelectedTask().aet}
+            ref={currentlyRating => this.currentlyRating = currentlyRating}
+          />
         <div className="table-container">
           <ReactTable 
+                ref={reactTable => this.reactTable = reactTable}
                 data={this.taskList}
                 columns={taskTableColumns}
                 className='task-table'
                 showPageJump={false}
-                showPageSizeOptions={false}
                 filterable={true}
+                defaultFilterMethod={this.filterTable}
+                showPageSizeOptions={false}
                 getTrProps={(state, rowInfo) => {                           
                   if (rowInfo !== undefined){
                   return {                  
-                      onClick: (e) => {                        
+                      onClick: (e) => {                       
                         if(!_.isEqual(this.state.selected,rowInfo.original) || _.isEqual(this.state.editing,rowInfo.original)){                                     
-                          this.setState({ selected: rowInfo.original })
+                          this.setState({ selected: rowInfo.original },function(){
+                            if(!_.isEqual(this.state.editing,this.state.selected)){
+                              this.setState({editing:null})
+                            }
+                          })
                           this.currentlyRating.changeCurrentTask(rowInfo.original.name,rowInfo.original.aet);
-                          debugger
-                          if(!_.isEqual(this.state.editing,this.state.selected)){
-                            this.setState({editing:null})
-                          }
                         }else{
                           this.setState({ selected: null })
                           this.currentlyRating.changeCurrentTask('None selected','-');
