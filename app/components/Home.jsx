@@ -23,6 +23,7 @@ class Home extends Component{
     //this.dbManager.insertRated(2,650);
     this.taskList = this.getTaskList();
     this.db.close();
+    this.registerShortcuts(this);
   }
 
   componentDidMount(){
@@ -40,8 +41,8 @@ class Home extends Component{
   }
 
   stopTimer(){
-    this.timerComponent.stop();
     this.insertRatedTask();
+    this.timerComponent.stop();
   }
 
   resetTimer(){
@@ -49,17 +50,17 @@ class Home extends Component{
   }
 
   submitTimer(){
-    this.timerComponent.submit();
     this.insertRatedTask();
+    this.timerComponent.submit();
   }
 
-  insertRatedTask(){
-    this.initializeDB();
-    var res=this.dbManager.insertTask(this.currentlyRating.state.task,this.currentlyRating.state.aet);
-    this.setState({selected:res})
-    this.dbManager.insertRated(res.task_id,this.timerComponent.state.elapsed);
-    this.taskList = this.getTaskList();
-    this.db.close();
+  insertRatedTask(self=this){
+    self.initializeDB();
+    var res=self.dbManager.insertTask(self.currentlyRating.state.task,self.currentlyRating.state.aet);
+    self.setState({selected:res})
+    self.dbManager.insertRated(res.task_id,self.timerComponent.state.elapsed);
+    self.taskList = self.getTaskList();
+    self.db.close();
   }
 
   getTaskList(){
@@ -75,6 +76,18 @@ class Home extends Component{
       return {started: false}
     }
     return this.timerComponent.state;
+  }
+  
+  registerShortcuts(self){ 
+    globalShortcut.register('Control+Command+D',function(){
+      self.resetTimer();
+    })
+    globalShortcut.register('Control+Command+Z',function(){
+      self.submitTimer(self);
+    })
+    globalShortcut.register('Control+Command+S',function(){
+      self.startTimer();
+    })
   }
 
   filterTable=(filter,row,column)=>{

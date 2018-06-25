@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 var remote = window.require('electron').remote;
-const {globalShortcut} = remote;
 var EasyTimer = require('easytimer.js');
 
 
@@ -13,7 +12,6 @@ class TimerComponent extends Component{
   }
 
   componentDidMount(){
-    this.registerShortcuts(this); 
     this.setEventListeners(this);
   }
 
@@ -27,20 +25,6 @@ class TimerComponent extends Component{
     this.timer.addEventListener('reset', function (e) {
       self.setState({elapsed: self.timer.getTimeValues().toString(['minutes','seconds'])});
     });
-  }
-
-  registerShortcuts(self){
-    globalShortcut.register('CommandOrControl+Alt+S',function(){
-      self.pauseStart();
-    });
-    
-    globalShortcut.register('CommandOrControl+Alt+D',function(){
-      self.reset();
-    })
-
-    globalShortcut.register('CommandOrControl+Alt+Z',function(){
-      self.stop();
-    })
   }
 
   pauseStart(){
