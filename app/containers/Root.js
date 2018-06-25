@@ -16,6 +16,7 @@ type Props = {
   history: {}
 };
 const remote = require('electron').remote;
+
 var EasyTimer = require('easytimer.js');
 
 export default class Root extends Component<Props> {
