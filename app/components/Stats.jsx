@@ -40,6 +40,8 @@ class Stats extends Component{
           data={ratedList}
           columns={taskTableColumns}
           className = 'rated-table'
+          showPageSizeOptions = {false}
+          pageSize = {100}
         />
       </div>
     );

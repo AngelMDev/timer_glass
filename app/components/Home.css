@@ -32,6 +32,10 @@
   background: rgba(255,255,255,.35);
 }
 
+.center{
+  margin: 0 auto;
+}
+
 .button-container {
   display: inline-flex;
 }
@@ -46,6 +50,10 @@
 
 .timer-button:hover{
   background: rgba(255,255,255,.30);
+}
+
+.action-btn-container{
+  display: flex;
 }
 
 .start {
@@ -70,7 +78,23 @@
 
 .task-table{
   width: 600px;
-  height: 300px;
+  height: 440px;
+}
+
+.icon{
+
+}
+
+.edit-btn{
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 8px;
+}
+
+.delete-btn{
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 8px;
 }
 
 #editable{
@@ -83,3 +107,5 @@
   text-decoration: none;
   color: black;
 }
+
+

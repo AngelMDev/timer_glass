@@ -1,4 +1,9 @@
 .rated-table {
-  height: 550px;
+  height: 500px;
   width: 650px;
+  margin-top: 0 !important;
+}
+
+.stats-container{
+  margin: 0 auto;
 }

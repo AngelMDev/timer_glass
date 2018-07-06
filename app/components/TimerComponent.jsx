@@ -57,21 +57,23 @@ class TimerComponent extends Component{
   }
   
   render(){
-    var startValue = this.state.started ? 'Pause' : 'Start'
-    return(
-    <div>
-      <div className="chrono-container glass">
-        <h1>{this.state.elapsed}</h1>
+    if(this.props.hidden){
+      return null;
+    }
+      var startValue = this.state.started ? 'Pause' : 'Start'
+      return(
+      <div className="center">
+        <div className="chrono-container glass">
+          <h1>{this.state.elapsed}</h1>
 
+        </div>
+        <div className="button-container">
+          <button className="timer-button start" onClick={this.props.start}>{startValue}</button>        
+          <button className="timer-button reset" onClick={this.props.reset}>Reset</button>   
+          <button className="timer-button pause" onClick={this.props.submit}>Submit</button>      
+          <button className="timer-button stop" onClick={this.props.stop}>Stop</button>    
+        </div>
       </div>
-      <div className="button-container">
-        <button className="timer-button start" onClick={this.props.start}>{startValue}</button>        
-        <button className="timer-button reset" onClick={this.props.reset}>Reset</button>   
-        <button className="timer-button pause" onClick={this.props.submit}>Submit</button>      
-        <button className="timer-button stop" onClick={this.props.stop}>Stop</button>    
-      </div>
-    </div>
-
     );
   }
 }

@@ -3,11 +3,10 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 import matchSorter from 'match-sorter';
 import CurrentlyRating from './CurrentlyRating'
-import TimerComponent from './TimerComponent'
 import './Home.css'
+import { ENGINE_METHOD_CIPHERS } from 'constants';
 var _ = require('lodash');
 var remote = window.require('electron').remote;
-const {globalShortcut} = remote;
 var EasyTimer = require('easytimer.js');
 var DBManager = require('../DB_Manager.js')
 const {dialog} = window.require('electron').remote
@@ -16,51 +15,34 @@ class Home extends Component{
 
   constructor(props){
     super(props);
-    this.state={selected:null,editing:null}
+    this.state={selected:props.selected,editing:null}
     this.initializeDB();
-    //var res=this.dbManager.insertTask("Exp YT",8);
-    //debugger
-    //this.dbManager.insertRated(2,650);
     this.taskList = this.getTaskList();
     this.db.close();
-    this.registerShortcuts(this);
   }
 
   componentDidMount(){
     this.currentlyRating.setState({reactTable:this.reactTable});
+    if(this.state.selected){
+      this.currentlyRating.changeCurrentTask(this.state.selected.name,this.state.selected.aet);
+    }else{
+      this.currentlyRating.changeCurrentTask('None selected','-');
+    }
+    this.props.root.setState({hiddenTimerC:false});
+  }
+
+  componentWillUnmount(){
+    this.props.root.setState({hiddenTimerC:true});
+  }
+
+
+  componentWillUpdate(){
+    this.props.root.selected = this.state.selected
   }
 
   initializeDB(){
     this.db=DBManager.load();
     this.dbManager=new DBManager(this.db);
-    
-  }
-
-  startTimer(){
-    this.timerComponent.pauseStart();
-  }
-
-  stopTimer(){
-    this.insertRatedTask();
-    this.timerComponent.stop();
-  }
-
-  resetTimer(){
-    this.timerComponent.stop();
-  }
-
-  submitTimer(){
-    this.insertRatedTask();
-    this.timerComponent.submit();
-  }
-
-  insertRatedTask(self=this){
-    self.initializeDB();
-    var res=self.dbManager.insertTask(self.currentlyRating.state.task,self.currentlyRating.state.aet);
-    self.setState({selected:res})
-    self.dbManager.insertRated(res.task_id,self.timerComponent.state.elapsed);
-    self.taskList = self.getTaskList();
-    self.db.close();
   }
 
   getTaskList(){
@@ -77,21 +59,8 @@ class Home extends Component{
     }
     return this.timerComponent.state;
   }
-  
-  registerShortcuts(self){ 
-    globalShortcut.register('Control+Command+D',function(){
-      self.resetTimer();
-    })
-    globalShortcut.register('Control+Command+Z',function(){
-      self.submitTimer(self);
-    })
-    globalShortcut.register('Control+Command+S',function(){
-      self.startTimer();
-    })
-  }
 
   filterTable=(filter,row,column)=>{
-    debugger
     var task=this.currentlyRating.state.task;
     return matchSorter(rows, filter.value, { keys: ["name","aet"] });
   }
@@ -148,7 +117,7 @@ class Home extends Component{
       accessor:'name',
       //filterMethod: (filter, rows) => matchSorter(rows, filter.value, { keys: ["name","aet"] }),
       filterable: false,
-      minWidth: 150,
+      minWidth: 150/*,
       //Check width of input
       Cell: row => {
         var is_editing=(_.isEqual(this.state.editing,row.original)) ? "" : "disabled";
@@ -156,48 +125,38 @@ class Home extends Component{
           //Check width of this thing
           <input type="text" id="editable" className={"glass edit-name "+is_editing} defaultValue={row.value} disabled={is_editing} onBlur={(evt) => this.handleBlur(row.original,evt)}></input> 
         )
-      }
+      }*/
     },{
       Header:'AET',
       accessor:'aet',
       filterable: false,
-      maxWidth:100,
+      maxWidth:100/*,
       Cell: row => {
         var is_editing=(_.isEqual(this.state.editing,row.original)) ? "" : "disabled";
         return(
           //Check width of this thing
           <input type="text" id="editable" className={"glass edit-aet "+is_editing} defaultValue={row.value} disabled={is_editing} onBlur={(evt) => this.handleBlur(row.original,evt)}></input> 
         )
-      }
+      }*/
     },{
       Header:'Last Used',
       accessor:'last_used',
       filterable: false,
       minWidth: 200
-    },{
+     },{
       Header: '',
       filterable: false,
       Cell: row => { 
         return(
-          <div>
-            <button className="edit-btn" onClick={() => this.handleEdit(row.original)}>Edit</button>
-            <button className="delete-btn" onClick={() => this.handleDelete(row.original)}>Delete</button>
+          <div className="action-btn-container">
+            <button className="edit-btn" onClick={() => this.handleEdit(row.original)}><i className="icon far fa-edit"></i></button>
+            <button className="delete-btn" onClick={() => this.handleDelete(row.original)}><i className="icon fas fa-trash-alt"></i></button>
           </div>
         )
       }
     }]
     return(
       <div className="home-container">
-        <div className="timer-container">
-          <TimerComponent 
-            ref={timerComponent => this.timerComponent = timerComponent}
-            timer={this.props.timer}
-            start={this.startTimer.bind(this)}
-            stop={this.stopTimer.bind(this)}
-            reset={this.resetTimer.bind(this)}
-            submit={this.submitTimer.bind(this)}
-          />
-        </div>
         <CurrentlyRating 
             // task={this.getSelectedTask().name}
             // aet={this.getSelectedTask().aet}
@@ -211,7 +170,7 @@ class Home extends Component{
                 className='task-table'
                 showPageJump={false}
                 filterable={true}
-                defaultFilterMethod={this.filterTable}
+                //defaultFilterMethod={this.filterTable}
                 showPageSizeOptions={false}
                 getTrProps={(state, rowInfo) => {                           
                   if (rowInfo !== undefined){
@@ -223,6 +182,7 @@ class Home extends Component{
                               this.setState({editing:null})
                             }
                           })
+                        
                           this.currentlyRating.changeCurrentTask(rowInfo.original.name,rowInfo.original.aet);
                         }else{
                           this.setState({ selected: null })
