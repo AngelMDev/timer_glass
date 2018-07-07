@@ -33,6 +33,7 @@ class Home extends Component{
 
   componentWillUnmount(){
     this.props.root.setState({hiddenTimerC:true});
+    this.props.root.selected = this.currentlyRating.state
   }
 
 
@@ -115,8 +116,8 @@ class Home extends Component{
     const taskTableColumns =[{
       Header:'Name',
       accessor:'name',
-      //filterMethod: (filter, rows) => matchSorter(rows, filter.value, { keys: ["name","aet"] }),
-      filterable: false,
+      filterMethod: (filter, rows) => matchSorter(rows, filter.value, { keys: ["name","aet"] }),
+      filterable: true,
       minWidth: 150/*,
       //Check width of input
       Cell: row => {
@@ -181,8 +182,7 @@ class Home extends Component{
                             if(!_.isEqual(this.state.editing,this.state.selected)){
                               this.setState({editing:null})
                             }
-                          })
-                        
+                          })                       
                           this.currentlyRating.changeCurrentTask(rowInfo.original.name,rowInfo.original.aet);
                         }else{
                           this.setState({ selected: null })

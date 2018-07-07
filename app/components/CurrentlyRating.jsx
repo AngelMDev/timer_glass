@@ -5,16 +5,16 @@ class CurrentlyRating extends Component{
 
   constructor(props){
     super(props);
-    this.state={task:this.props.task,aet:this.props.aet,reactTable:null};
+    this.state={name:this.props.name,aet:this.props.aet,reactTable:null};
     this.reactTable=props.reactTable;
   }
 
-  changeCurrentTask(_task,_aet){
-    this.setState({task: _task,aet:_aet});
+  changeCurrentTask(_name,_aet){
+    this.setState({name: _name,aet:_aet});
   }
 
   handleNameChange(e){
-    this.setState({task:e.target.value});
+    this.setState({name:e.target.value});
     this.state.reactTable.filterColumn('name',e.target.value);
   }
 
@@ -26,7 +26,7 @@ class CurrentlyRating extends Component{
     return (
       <div className="current-task-container">
         <div className="current-title glass">Currently Rating &nbsp; </div>
-        <input className="current-task-name glass" type="text" value={this.state.task} onChange={this.handleNameChange.bind(this)}></input>
+        <input className="current-task-name glass" type="text" value={this.state.name} onChange={this.handleNameChange.bind(this)}></input>
         <input className="current-task-aet glass" type="text" value={this.state.aet} onChange={this.handleAetChange.bind(this)}></input>
       </div>
     )
