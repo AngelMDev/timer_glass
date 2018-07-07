@@ -118,6 +118,7 @@ class Home extends Component{
       accessor:'name',
       filterMethod: (filter, rows) => matchSorter(rows, filter.value, { keys: ["name","aet"] }),
       filterable: true,
+      filterAll: true,
       minWidth: 150/*,
       //Check width of input
       Cell: row => {
