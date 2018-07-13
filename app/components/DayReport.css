@@ -1,0 +1,24 @@
+.day-wrapper{
+    width:90px;
+    height:90px;
+    border-radius: 8px;
+    transition: all 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shrink{
+    transform: scale(0);
+    opacity: 0;
+}
+
+.day-content{
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.invisible{
+    visibility: hidden;
+    opacity: 0;
+}

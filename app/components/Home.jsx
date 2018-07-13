@@ -33,12 +33,12 @@ class Home extends Component{
 
   componentWillUnmount(){
     this.props.root.setState({hiddenTimerC:true});
-    this.props.root.selected = this.currentlyRating.state
+    this.props.root.selected = this.currentlyRating.state;
   }
 
 
   componentWillUpdate(){
-    this.props.root.selected = this.state.selected
+    this.props.root.selected = {name:this.currentlyRating.state.name,aet:this.currentlyRating.state.aet};
   }
 
   initializeDB(){
@@ -142,7 +142,8 @@ class Home extends Component{
       }*/
     },{
       Header:'Last Used',
-      accessor:'last_used',
+      id:'last_used',
+      accessor: d=>(new Date(d.last_used).toLocaleTimeString("en-US",{weekday: "short", year: "numeric", day: "numeric", minute: "2-digit", month: "short", hour: "2-digit"})),
       filterable: false,
       minWidth: 200
      },{
@@ -163,6 +164,8 @@ class Home extends Component{
             // task={this.getSelectedTask().name}
             // aet={this.getSelectedTask().aet}
             ref={currentlyRating => this.currentlyRating = currentlyRating}
+            root={this.props.root}
+            home={this}
           />
         <div className="table-container">
           <ReactTable 

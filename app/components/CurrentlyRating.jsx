@@ -9,6 +9,10 @@ class CurrentlyRating extends Component{
     this.reactTable=props.reactTable;
   }
 
+  componentDidUpdate(){
+    this.props.root.selected = this.state;    
+  }
+
   changeCurrentTask(_name,_aet){
     this.setState({name: _name,aet:_aet});
   }

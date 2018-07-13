@@ -48,7 +48,7 @@ class DBManager {
     return DBManager.formatResult(this.db.exec(`SELECT * FROM Tasks WHERE name = '${_name}' AND aet = ${_aet}`))[0];
   }
 
-  insertRated(_taskId, _time,_completedAt=new Date().toLocaleTimeString("en-US",this.dateOptions)){
+  insertRated(_taskId, _time,_completedAt=new Date().getTime()){
     var rated={
       rated_id: null,
       task_id: _taskId,
@@ -61,7 +61,7 @@ class DBManager {
   }
 
   updateTask(taskId){
-    this.db.run(`UPDATE Tasks SET last_used = "${new Date().toLocaleTimeString("en-US",this.dateOptions)} " WHERE task_id = ${taskId}`);
+    this.db.run(`UPDATE Tasks SET last_used = ${new Date().getTime()} WHERE task_id = ${taskId}`);
     this.save();
   }
 
@@ -105,6 +105,17 @@ class DBManager {
     return DBManager.formatResult(res);
   }
 
+  getRatedNewerThan(time){
+    var res = this.db.exec(`SELECT SUM(aet) AS "Total_AET" FROM Rated INNER JOIN Tasks ON Rated.task_id = Tasks.task_id where completed_at > ${time}`);
+    return DBManager.formatResult(res);
+  }
+
+  getRatedOnDay(day){
+    var dayEnd=day+1000*3600*24;
+    var res = this.db.exec(`SELECT SUM(aet) AS "Total_AET" FROM Rated INNER JOIN Tasks ON Rated.task_id = Tasks.task_id where completed_at >= ${day} AND completed_at < ${dayEnd}`);
+    return DBManager.formatResult(res);
+  }
+
   static formatResult(arr){
     if (arr.length===0) return [];
     var obj=arr[0];
@@ -117,6 +128,14 @@ class DBManager {
       newArr.push(newObj)
     })
     return newArr;
+  }
+
+  static convertMinsToHrsMins(minutes) {
+    var h = Math.floor(minutes / 60);
+    var m = minutes % 60;
+    h = h < 10 ? '0' + h : h;
+    m = m < 10 ? '0' + m : Math.trunc(m);
+    return h + ':' + m;
   }
 
 }

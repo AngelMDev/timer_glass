@@ -1,0 +1,57 @@
+.reports-container{
+    align-self: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.reports-container > span{
+    margin: auto;
+}
+
+.calendar-input{
+    width: 232px;
+    padding: 10px;
+    padding-left: 10px;
+    border-radius: 6px;
+    font-size:16px;
+    border: none;
+    margin: 0 auto;
+    text-align: center;
+    transition: all 0.5s ease;
+}
+
+.flatten-bottom-border{
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.report-row{
+    margin: 50px;
+    margin-bottom: 80px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+ .rc-calendar{
+    background-clip: padding-box;
+    background: rgba(255,255,255,.35);
+  }
+
+  .rc-calendar{
+    box-shadow: none;
+    border: none;
+    border-radius: 6px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: 41px;
+    width: 252px;
+  }
+
+  .rc-calendar-year-select, .rc-calendar-month-select, .rc-calendar-prev-month-btn, .rc-calendar-prev-year-btn, .rc-calendar-next-month-btn, .rc-calendar-next-year-btn {
+      color: black;
+  }
+
+  .rc-calendar-input, .rc-calendar-input-wrap{
+      display: none;
+  }

@@ -4,9 +4,11 @@ import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
 import Sidebar from '../components/Sidebar';
 import Home from '../components/Home';
-import Stats from '../components/Stats'
-import TimerComponent from '../components/TimerComponent'
-import '../components/Home.css'
+import Stats from '../components/Stats';
+import Reports from '../components/Reports';
+import TimerComponent from '../components/TimerComponent';
+import $ from "jquery";
+import '../components/Home.css';
 import {
   Route,
   NavLink,
@@ -27,7 +29,7 @@ export default class Root extends Component<Props> {
   constructor(props){
     super(props);
     this.props=props;
-    this.state={elapsed: "00:00",hiddenTimerC:false};  
+    this.state={elapsed: "00:00",hiddenTimerC:false,momentSelected:null};  
     this.selected=null;
     this.timer=new EasyTimer();
     this.tray=remote.getGlobal('tray');
@@ -64,8 +66,10 @@ export default class Root extends Component<Props> {
     self.initializeDB();
     var res=self.dbManager.insertTask(self.selected.name,self.selected.aet);
     self.dbManager.insertRated(res.task_id,self.timerComponent.state.elapsed);
-    if(self.home)
+    if(self.home){
       self.home.taskList = self.getTaskList();
+      self.home.setState({selected:{name:this.selected.name,aet:this.selected.aet,task_id:res.task_id}});
+    }
     self.db.close();
   }
 
@@ -97,6 +101,10 @@ export default class Root extends Component<Props> {
     });
   }
 
+  saveMoment(moment){
+    this.setState({momentSelected:moment});
+  }
+
   render() {
     return (
       <HashRouter>
@@ -116,7 +124,7 @@ export default class Root extends Component<Props> {
             </div>
             <Route exact path="/" render={()=> <Home ref={home => this.home = home} timer={this.timer} root={this} selected={this.selected} />} />
             <Route path="/Stats" render={()=> <Stats />} />
-            <Route path="/List" component={null} />
+            <Route path="/List" render={()=> <Reports onMomentSelect={this.saveMoment.bind(this)} momentSelected={this.state.momentSelected}/>} />
             <Route path="/Music" component={null} />
             <Route path="/Settings" component={null} />
           </div>
@@ -125,3 +133,4 @@ export default class Root extends Component<Props> {
     );
   }
 }
+
